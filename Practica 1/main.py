@@ -1,36 +1,41 @@
 import requests
 import random
 import math
+import sys
 
-num_pop = 500
-num_gen = 64
-prob_t = 0.05
-prob_m = 0.02
-cicles = 10
+#HIPERPARAMETROS
+num_pop = int(sys.argv[1])#500
+num_gen = int(sys.argv[2])#64
+prob_t = float(sys.argv[3])#0.05
+prob_m = float(sys.argv[4])#0.02
+cicles = int(sys.argv[5])#10
 website = "http://memento.evannai.inf.uc3m.es/age/test?c="
 
 
 #INICIALIZAR POBLACION
-population = []
-for i in range(num_pop):
-    chromosome = ""
-    for j in range(num_gen):
-        chromosome += str(random.randint(0, 1))
-    population.append(chromosome)
+def initialize_population(num_pop, num_gen):
+    population = []
+    for i in range(num_pop):
+        chromosome = ""
+        for j in range(num_gen):
+            chromosome += str(random.randint(0, 1))
+        population.append(chromosome)
+    return population
 
-for cicle in range(cicles):
 
-    #EVALUAR POBLACION
+#EVALUAR POBLACION
+def evaluate_population(num_pop, website, population):
     population_fitness = []
     for i in range(num_pop):
         population_fitness.append(float(requests.get(website + population[i]).text))
     print("Mejor CH " + str(population_fitness.index(min(population_fitness))) + " con ft: " + str(min(population_fitness)))
+    return population_fitness
 
 
-    #SELECCIONAR LOS MEJORES
+#SELECCIONAR LOS MEJORES
+def tournament_population(num_pop, prob_t, population, population_fitness):
     population_selection = []
     t_size = math.floor(prob_t * num_pop)
-
     for i in range(num_pop):
         winner = i
         for j in range(t_size):
@@ -41,9 +46,11 @@ for cicle in range(cicles):
                 if population_fitness[candidate] < population_fitness[winner]:
                     winner = candidate
         population_selection.append(population[winner])
+    return population_selection
 
 
-    #CRUCE
+#CRUCE
+def cross_population(num_pop, num_gen, population_selection):
     population_cross = []
 
     if num_pop%2 == 1:   #Poblaciones impares
@@ -70,8 +77,11 @@ for cicle in range(cicles):
         population_cross.append(son_1)
         population_cross.append(son_2)
 
+    return population_cross
 
-    #MUTACION
+
+#MUTACION
+def mutate_population(num_pop, num_gen, prob_m, population_cross):
     population_mutated = []
     for i in range(num_pop):
         chromosome = ""
@@ -85,4 +95,12 @@ for cicle in range(cicles):
                 chromosome += population_cross[i][j]
         population_mutated.append(chromosome)
 
-    population = population_mutated
+    return population_mutated
+
+#MAIN
+population = initialize_population(num_pop, num_gen)
+for cicle in range(cicles):
+    population_fitness = evaluate_population(num_pop, website, population)
+    population_selection = tournament_population(num_pop, prob_t, population, population_fitness)
+    population_cross = cross_population(num_pop, num_gen, population_selection)
+    population = mutate_population(num_pop, num_gen, prob_m, population_cross)
