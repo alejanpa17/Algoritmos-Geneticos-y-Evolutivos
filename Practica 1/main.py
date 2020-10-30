@@ -13,8 +13,8 @@ prob_m = float(sys.argv[4])#0.02
 cicles = int(sys.argv[5])#10
 #website = "http://memento.evannai.inf.uc3m.es/age/test?c="
 #website = "http://memento.evannai.inf.uc3m.es/age/alfa?c="
-website = "http://163.117.164.219/age/madriz?c="
-#website = "http://163.117.164.219/age/isidro?c="
+#website = "http://163.117.164.219/age/madriz?c="
+website = "http://163.117.164.219/age/isidro?c="
 
 #INICIALIZAR POBLACION
 def initialize_population(num_pop, num_gen):
@@ -125,6 +125,7 @@ def mutate_population(num_pop, num_gen, prob_m, population_cross):
 
 #MAIN
 population = initialize_population(num_pop, num_gen)
+start = time.time()
 best_ind = ""
 best_fitness = 99999
 for cicle in range(cicles):
@@ -132,10 +133,12 @@ for cicle in range(cicles):
     if population_fitness[0] < best_fitness:
         best_ind = population[0]
         best_fitness = population_fitness[0]
-        print("CH = " + str(population[0]) + " ft = " + str(population_fitness[0]))
+        #print("CH = " + str(population[0]) + " ft = " + str(population_fitness[0]))
+    print(str(population_fitness[0]))
 
     population_selection = tournament_population(num_pop, prob_t, population, population_fitness)
     population_cross = cross_population(num_pop, num_gen, population_selection)
     population = mutate_population(num_pop, num_gen, prob_m, population_cross)
+#print((time.time() - start)/cicles)
 
 print("Mejor CH = " + str(best_ind) + " con ft = " + str(best_fitness))
