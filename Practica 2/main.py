@@ -11,7 +11,8 @@ num_pop = int(sys.argv[1])#100
 num_gen = int(sys.argv[2])#4 - 10
 prob_t = float(sys.argv[3])#0.05
 lambda_ = int(sys.argv[4])#10
-cicles = int(sys.argv[5])#10
+num_fam = int(sys.argv[5])#2-4
+cicles = int(sys.argv[6])#10
 
 website = "http://163.117.164.219/age/robot4?"
 
@@ -41,46 +42,41 @@ def evaluate_population(num_pop, num_gen, website, population):
 
 
 #SELECCION
-def tournament_population(num_pop, prob_t, lambda_, population, population_variance, population_fitness):
+def tournament_population(num_pop, prob_t, lambda_, num_fam, population, population_variance, population_fitness):
     population_selection = []
     population_selection_var = []
 
     t_size = math.floor(prob_t * num_pop)
 
     #TORNEO
-    for i in range(lambda_*2):
-        winner = i
-        for j in range(t_size):
-            if j == 0:
-                winner = random.randint(0, num_pop- 1)
-            else:
-                candidate = random.randint(0, num_pop - 1)
-                if population_fitness[candidate] < population_fitness[winner]:
-                    winner = candidate
+    for i in range(lambda_*num_fam):
+        winner = random.randint(0, num_pop- 1)
+        for j in range(t_size - 1):
+            candidate = random.randint(0, num_pop - 1)
+            if population_fitness[candidate] < population_fitness[winner]:
+                winner = candidate
         population_selection.append(population[winner])
         population_selection_var.append(population_variance[winner])
+
     return population_selection, population_selection_var
 
 
 #CRUCE
-def cross_population(lambda_, num_gen, population_selection, population_selection_var):
+def cross_population(lambda_, num_gen, num_fam, population_selection, population_selection_var):
     population_cross = []
     population_cross_var = []
 
-    for i in range(int(lambda_/2)):
+    for i in range(int(lambda_)):
 
-        father = population_selection[i*2]
-        father_var = population_selection_var[i*2]
+        family = []
+        family_var = []
 
-        mother = population_selection[i*2 + 1]
-        mother_var = population_selection_var[i*2 + 1]
+        for j in range(num_fam):
+            family.append(population_selection[i*num_fam + j])
+            family_var.append(population_selection_var[i*num_fam + j])
 
-        son = []
-        son_var = []
-
-        for x in range(num_gen):
-            son.append((father[x]+mother[x])/2)
-            son_var.append(math.sqrt(father_var[x]+mother_var[x]))
+        son = np.mean(family, axis=0).tolist()
+        son_var = random.choice(family_var)
 
         population_cross.append(son)
         population_cross_var.append(son_var)
@@ -92,19 +88,33 @@ def cross_population(lambda_, num_gen, population_selection, population_selectio
 def mutate_population(lambda_, num_gen, population_cross, population_cross_var):
     population_mutated = []
     population_mutated_var = []
+    b = 1
 
     for i in range(lambda_):
         mutated = []
         mutated_var = []
         for j in range(num_gen):
             mutated.append(population_cross[i][j] + np.random.normal(scale = population_cross_var[i][j]))
-            mutated_var.append()
+            tau = b/math.sqrt(2 * math.sqrt(num_gen))
+            tau0 = b/math.sqrt(2 * num_gen)
+            mutated_var.append(population_cross_var[i][j]*math.exp(np.random.normal(scale = tau0))*math.exp(np.random.normal(scale = tau)))
 
         population_mutated.append(mutated)
         population_mutated_var.append(mutated_var)
 
     return population_mutated, population_mutated_var
 
+
+#UNION DE POBLACIONES
+def merge_populations(lambda_, population, population_variance, population_fitness, population_mutated, population_mutated_var):
+
+    for i in range(lambda_):
+        index = population_fitness.index(max(population_fitness))
+        population.pop(index)
+        population_variance.pop(index)
+        population_fitness.pop(index)
+
+    return population + population_mutated, population_variance + population_mutated_var
 
 
 
@@ -120,9 +130,12 @@ for cicle in range(cicles):
         best_fitness = min(population_fitness)
         print(best_fitness)
 
-    population_selection, population_selection_var = tournament_population(num_pop, prob_t, lambda_, population, population_variance, population_fitness)
-    population_cross, population_cross_var = cross_population(lambda_, num_gen, population_selection, population_selection_var)
+    population_selection, population_selection_var = tournament_population(num_pop, prob_t, lambda_, num_fam, population, population_variance, population_fitness)
+    population_cross, population_cross_var = cross_population(lambda_, num_gen, num_fam, population_selection, population_selection_var)
     population_mutated, population_mutated_var = mutate_population(lambda_, num_gen, population_cross, population_cross_var)
+    population, population_variance = merge_populations(lambda_, population, population_variance, population_fitness, population_mutated, population_mutated_var)
 
-print((time.time() - start)/cicles)
+print("Tiempo de ejecucion = " + str((time.time() - start)/cicles))
 print("Mejor ft = " + str(best_fitness))
+print("Mejor individuo" + str(population[population_fitness.index(min(population_fitness))]))
+print("Mejor individuo (varianzas)" + str(population_variance[population_fitness.index(min(population_fitness))]))
