@@ -66,7 +66,7 @@ def cross_population(lambda_, num_gen, num_fam, population_selection, population
     population_cross = []
     population_cross_var = []
 
-    for i in range(int(lambda_)):
+    for i in range(lambda_):
 
         family = []
         family_var = []
@@ -75,8 +75,13 @@ def cross_population(lambda_, num_gen, num_fam, population_selection, population
             family.append(population_selection[i*num_fam + j])
             family_var.append(population_selection_var[i*num_fam + j])
 
+        family_var = np.rot90(np.array(family_var), k = 3)
+
         son = np.mean(family, axis=0).tolist()
-        son_var = random.choice(family_var)
+        son_var = []
+
+        for j in range(num_gen):
+            son_var.append(random.choice(family_var[j]))
 
         population_cross.append(son)
         population_cross_var.append(son_var)
