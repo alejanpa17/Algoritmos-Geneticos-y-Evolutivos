@@ -10,9 +10,9 @@ import numpy as np
 num_pop = int(sys.argv[1])#100
 num_gen = int(sys.argv[2])#4 - 10
 prob_t = float(sys.argv[3])#0.05
-lambda_ = int(sys.argv[4])#10
-num_fam = int(sys.argv[5])#2-4
-cicles = int(sys.argv[6])#10
+lambda_ = int(sys.argv[4])#40
+num_fam = int(sys.argv[5])#2-5
+cicles = int(sys.argv[6])#150
 
 website = "http://163.117.164.219/age/robot4?"
 
@@ -20,7 +20,7 @@ website = "http://163.117.164.219/age/robot4?"
 #INICIALIZAR POBLACION
 def initialize_population(num_pop, num_gen):
     population = np.random.uniform(-180,180,[num_pop, num_gen])
-    population_variance = np.random.uniform(0,180,[num_pop, num_gen])
+    population_variance = np.random.uniform(140,200,[num_pop, num_gen])
     return population.tolist(), population_variance.tolist()
 
 
@@ -126,14 +126,13 @@ def merge_populations(lambda_, population, population_variance, population_fitne
 #MAIN
 population, population_variance = initialize_population(num_pop, num_gen)
 start = time.time()
-best_ind = ""
 best_fitness = 999999
 for cicle in range(cicles):
     population_fitness = evaluate_population(num_pop, num_gen, website, population)
     if min(population_fitness) < best_fitness:
-        best_ind = population[0]
         best_fitness = min(population_fitness)
-        print(best_fitness)
+        #print(best_fitness)
+    print(min(population_fitness))
 
     population_selection, population_selection_var = tournament_population(num_pop, prob_t, lambda_, num_fam, population, population_variance, population_fitness)
     population_cross, population_cross_var = cross_population(lambda_, num_gen, num_fam, population_selection, population_selection_var)
