@@ -1,4 +1,5 @@
 Tiempo de ejecucion = 0.816796358426412
+website = "http://163.117.164.219/age/robot4?"
 Evaluaciones = 45k
 Mejor ft = 0.0
 Mejor individuo[10.123456789376585, 5.9876540016486155, 3.6666659989906076, 1.7654320996485207]

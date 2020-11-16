@@ -28,11 +28,11 @@ echo "Tamano de la poblacion"
 # python3 main.py 500 4 0.05 300 3 150 > solutions/pop_500.txt
 
 #Tamano de la familia
-echo "Tamano de la poblacion"
-python3 main.py 300 4 0.05 180 2 150 > solutions/fam_2.txt
-python3 main.py 300 4 0.05 180 3 150 > solutions/fam_3.txt
-python3 main.py 300 4 0.05 180 4 150 > solutions/fam_4.txt
-python3 main.py 300 4 0.05 180 5 150 > solutions/fam_5.txt
-python3 main.py 300 4 0.05 180 6 150 > solutions/fam_6.txt
-python3 main.py 300 4 0.05 180 7 150 > solutions/fam_7.txt
-python3 main.py 300 4 0.05 180 8 150 > solutions/fam_8.txt
+echo "Tamano de la familia"
+# python3 main.py 300 4 0.05 180 2 150 > solutions/fam_2.txt
+# python3 main.py 300 4 0.05 180 3 150 > solutions/fam_3.txt
+# python3 main.py 300 4 0.05 180 4 150 > solutions/fam_4.txt
+# python3 main.py 300 4 0.05 180 5 150 > solutions/fam_5.txt
+# python3 main.py 300 4 0.05 180 6 150 > solutions/fam_6.txt
+# python3 main.py 300 4 0.05 180 7 150 > solutions/fam_7.txt
+# python3 main.py 300 4 0.05 180 8 150 > solutions/fam_8.txt
