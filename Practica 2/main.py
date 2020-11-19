@@ -14,8 +14,8 @@ lambda_ = int(sys.argv[4])#40
 num_fam = int(sys.argv[5])#2-5
 cicles = int(sys.argv[6])#150
 
-#website = "http://163.117.164.219/age/robot4?"
-website = "http://163.117.164.219/age/robot10?"
+website = "http://163.117.164.219/age/robot4?"
+#website = "http://163.117.164.219/age/robot10?"
 
 
 
@@ -27,9 +27,13 @@ def initialize_population(num_pop, num_gen):
 
 
 #EVALUAR POBLACION
-def evaluate_population(num_pop, num_gen, website, population):
-    population_fitness = []
-    for i in range(num_pop):
+def evaluate_population(num_pop, num_gen, lambda_, evaluations, website, population, population_fitness):
+
+    evaluated = 0
+    if len(population_fitness) > 0:
+        evaluated = num_pop - lambda_
+
+    for i in range(evaluated, num_pop):
         evaluate = ""
         value = 0
         for j in range(num_gen):
@@ -39,8 +43,9 @@ def evaluate_population(num_pop, num_gen, website, population):
         except:
             time.sleep(1)
             value = float(requests.get(website + evaluate).text)
+        evaluations += 1
         population_fitness.append(value)
-    return population_fitness
+    return population_fitness, evaluations
 
 
 #SELECCION
@@ -128,20 +133,21 @@ def merge_populations(lambda_, population, population_variance, population_fitne
 #MAIN
 population, population_variance = initialize_population(num_pop, num_gen)
 start = time.time()
-best_fitness = 999999
-for cicle in range(cicles):
-    population_fitness = evaluate_population(num_pop, num_gen, website, population)
-    if min(population_fitness) < best_fitness:
-        best_fitness = min(population_fitness)
-        #print(best_fitness)
-    print(min(population_fitness))
+evaluations = 0
+population_fitness = []
 
+for cicle in range(cicles):
+    population_fitness, evaluations = evaluate_population(num_pop, num_gen, lambda_, evaluations, website, population, population_fitness)
+    print(min(population_fitness))
+    if min(population_fitness) == 0:
+        break
     population_selection, population_selection_var = tournament_population(num_pop, prob_t, lambda_, num_fam, population, population_variance, population_fitness)
     population_cross, population_cross_var = cross_population(lambda_, num_gen, num_fam, population_selection, population_selection_var)
     population_mutated, population_mutated_var = mutate_population(lambda_, num_gen, population_cross, population_cross_var)
     population, population_variance = merge_populations(lambda_, population, population_variance, population_fitness, population_mutated, population_mutated_var)
 
-print("Tiempo de ejecucion = " + str((time.time() - start)/cicles))
-print("Mejor ft = " + str(best_fitness))
-print("Mejor individuo" + str(population[population_fitness.index(min(population_fitness))]))
-print("Mejor individuo (varianzas)" + str(population_variance[population_fitness.index(min(population_fitness))]))
+print("Tiempo de ejecucion = " + str((time.time() - start)))
+print("Numero de evaluaciones = " + str(evaluations))
+print("Mejor ft = " + str(min(population_fitness)))
+print("Mejor individuo " + str(population[population_fitness.index(min(population_fitness))]))
+print("Mejor individuo (varianzas) " + str(population_variance[population_fitness.index(min(population_fitness))]))
