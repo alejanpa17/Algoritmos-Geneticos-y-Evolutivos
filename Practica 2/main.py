@@ -14,8 +14,11 @@ lambda_ = int(sys.argv[4])#40
 num_fam = int(sys.argv[5])#2-5
 cicles = int(sys.argv[6])#150
 
-website = "http://163.117.164.219/age/robot4?"
+#website = "http://163.117.164.219/age/robot4?"
+website = "http://163.117.164.219/age/robot6?"
 #website = "http://163.117.164.219/age/robot10?"
+#website = "http://163.117.164.219/age/robot10B?"
+
 
 
 
