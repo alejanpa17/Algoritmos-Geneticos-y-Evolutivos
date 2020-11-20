@@ -14,10 +14,10 @@ lambda_ = int(sys.argv[4])#40
 num_fam = int(sys.argv[5])#2-5
 cicles = int(sys.argv[6])#150
 
-#website = "http://163.117.164.219/age/robot4?"
-website = "http://163.117.164.219/age/robot6?"
+website = "http://163.117.164.219/age/robot4?"
+#website = "http://163.117.164.219/age/robot6?"
 #website = "http://163.117.164.219/age/robot10?"
-#website = "http://163.117.164.219/age/robot10B?"
+#website = "http://163.117.164.219/age/robot10b?"
 
 
 
@@ -42,10 +42,10 @@ def evaluate_population(num_pop, num_gen, lambda_, evaluations, website, populat
         for j in range(num_gen):
             evaluate += "c" + str(j + 1) + "=" + str(population[i][j]) + "&"
         try:
-            value = float(requests.get(website + evaluate).text)
+            value = abs(float(requests.get(website + evaluate).text))
         except:
             time.sleep(1)
-            value = float(requests.get(website + evaluate).text)
+            value = abs(float(requests.get(website + evaluate).text))
         evaluations += 1
         population_fitness.append(value)
     return population_fitness, evaluations
